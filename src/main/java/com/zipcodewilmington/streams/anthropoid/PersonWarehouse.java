@@ -45,21 +45,9 @@ public final class PersonWarehouse implements Iterable<Person> {
      * @return list of uniquely named Person objects
      */ //TODO
     public Stream<Person> getUniquelyNamedPeople() {
-        Set<String> set = new HashSet<>(people.size());
+//        Set<String> set = new HashSet<>(people.size()); <- passes without that
+        Set<String> set = new HashSet<>();
         return people.stream().filter(p -> set.add(p.getName()));
-
-        //Alternate solution to get unique names create a new list to compare to, if new list contains the name return false
-        //else return add to new list from person list and return true and return the stream
-//        List<String> uniqueNames = new ArrayList<>();
-//        return people.stream()
-//                .filter(person -> {
-//                    if(uniqueNames.contains(person.getName())){
-//                        return false;
-//                    }
-//                    else
-//                        uniqueNames.add(person.getName());
-//                    return true;
-//                });
     }
 
 
@@ -68,9 +56,10 @@ public final class PersonWarehouse implements Iterable<Person> {
      * @return a Stream of respective
      */ //TODO
     public Stream<Person> getUniquelyNamedPeopleStartingWith(Character character) {
-        return people.stream()
-                .filter(person -> person.getName().charAt(0) == character);
-        //return people.stream().distinct();
+        Stream<Person> uniquePeople = getUniquelyNamedPeople();
+        return uniquePeople.filter(person -> person.getName().charAt(0) == character);
+
+        //return people.stream().distinct(); <-doesn't work
     }
 
     /**
@@ -86,7 +75,7 @@ public final class PersonWarehouse implements Iterable<Person> {
      */ // TODO
     public Map<Long, String> getIdToNameMap() {
         return people.stream()
-                .collect(Collectors.toMap(Person:: getPersonalId, Person::getName));
+                .collect(Collectors.toMap(Person::getPersonalId, Person::getName));
     }
 
 
@@ -104,6 +93,8 @@ public final class PersonWarehouse implements Iterable<Person> {
     public Stream<String> getAllAliases() {
         //return people.stream().flatMap(person -> Arrays.stream(person.getAliases()));
         return getNestedAliases().flatMap(Function.identity());
+        //return getNestedAliases().flatMap(alias -> alias); //is same as above??
+
     }
 
     // DO NOT MODIFY
